@@ -1,0 +1,78 @@
+import * as fs from "fs";
+
+// TODO: there must be a more efficient way to do this
+
+// Reveives file, encoding and a callback function
+fs.readFile("./day-1-input.txt", "utf8", (err, data: string) => {
+  if (err) {
+    console.log(err);
+    return;
+  }
+
+  let total: number = 0;
+
+  const numberRegex: RegExp = /\d/;
+  const globalNumberRegex: RegExp = /\d/gi;
+
+  const globalNumberWordRegex: RegExp =
+    /(one|two|three|four|five|six|seven|eight|nine)/gi;
+
+  const numberWordRegex: RegExp =
+    /(one|two|three|four|five|six|seven|eight|nine)/;
+
+  const myRegex: RegExp = new RegExp(
+    `(${numberRegex.source}|${globalNumberWordRegex.source})`,
+    "gi",
+  );
+
+  // string will be later converted to number
+  // made string initially to make it easier
+
+  const oneDigitNumbers: Map<string, string> = new Map<string, string>();
+
+  oneDigitNumbers.set("one", "1");
+  oneDigitNumbers.set("two", "2");
+  oneDigitNumbers.set("three", "3");
+  oneDigitNumbers.set("four", "4");
+  oneDigitNumbers.set("five", "5");
+  oneDigitNumbers.set("six", "6");
+  oneDigitNumbers.set("seven", "7");
+  oneDigitNumbers.set("eight", "8");
+  oneDigitNumbers.set("nine", "9");
+  oneDigitNumbers.set("", "");
+
+  let textLine: Array<string> = data.split("\n");
+
+  // Too complex, but works at last
+
+  // for each line
+  textLine.map((element): void => {
+    let digits: string | undefined = "";
+
+    const matches = element.match(myRegex);
+    const cleanedString = matches ? matches.join("") : "";
+
+    const digitsMatch = cleanedString.match(globalNumberRegex) ?? "";
+
+    const allWordsMatch = cleanedString.match(globalNumberWordRegex) ?? "";
+
+    if (cleanedString[0] === digitsMatch[0]) {
+      digits += digitsMatch[0];
+    } else {
+      digits += oneDigitNumbers.get(allWordsMatch[0]);
+    }
+
+    if (cleanedString.at(-1) === digitsMatch[digitsMatch.length - 1]) {
+      digits += digitsMatch[digitsMatch.length - 1];
+    } else {
+      digits += allWordsMatch[allWordsMatch.length - 1]
+        ? oneDigitNumbers.get(allWordsMatch[allWordsMatch.length - 1])
+        : "";
+    }
+
+    console.log(digits);
+
+    total += parseInt(digits) ? parseInt(digits) : 0;
+  });
+  console.log(total);
+});
